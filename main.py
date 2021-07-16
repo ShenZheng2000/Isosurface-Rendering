@@ -41,6 +41,26 @@ def get_mgrid(sidelen, dim=2):
     mgrid = mgrid.reshape(-1, dim)
     return mgrid
 
+# This function currently does not work because of out of memory
+def get_mgrid2(sidelen, dim=2):
+    '''Generates a flattened grid of (x,y,...) coordinates in a range of -1 to 1.
+    sidelen: int
+    dim: int'''
+    tensors = tuple(dim * [torch.linspace(-1, 1, steps=sidelen)]) # (x,y） related tensor
+
+    tensors_1 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # first input
+    tensors_2 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # second input
+    tensors_3 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # third input
+
+    tensors = tensors + tensors_1 + tensors_2 + tensors_3 # total tensor
+
+    print(len(tensors))
+
+    mgrid = torch.stack(torch.meshgrid(*tensors), dim=-1)
+    mgrid = mgrid.reshape(-1, dim)
+
+    return mgrid
+
 def get_cameraman_tensor(sidelength):
     # print("camera data is", type(skimage.data.camera()))
     # print("the shape of the img is", skimage.data.camera().shape)
