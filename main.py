@@ -38,7 +38,7 @@ def gradient(y, x, grad_outputs=None):
     grad = torch.autograd.grad(y, [x], grad_outputs=grad_outputs, create_graph=True)[0]
     return grad
 
-def get_mgrid(sidelen, dim=2):
+def get_mgrid(sidelen, text, dim = 2, other_dim = 3): # dim default is 2.
     '''Generates a flattened grid of (x,y,...) coordinates in a range of -1 to 1.
     sidelen: int
     dim: int'''
@@ -53,8 +53,8 @@ def get_mgrid(sidelen, dim=2):
     #print(len(tensors))
 
     mgrid = torch.stack(torch.meshgrid(*tensors), dim=-1)
-    mgrid = mgrid.reshape(-1, dim + 3) # this 3 means another 3 coordinates, need to adjust when additional time step is considered
-    print(mgrid)
+    mgrid = mgrid.reshape(-1, dim + other_dim) # this 3 means another 3 coordinates, need to adjust when additional time step is considered
+    print("grided image has size of", mgrid.size())
 
     return mgrid
 
@@ -75,6 +75,7 @@ def get_cameraman_tensor(sidelength, image):
         Normalize(torch.Tensor([0.5]), torch.Tensor([0.5]))
     ])
     img = transform(img)
+
     return img
 
 
@@ -180,13 +181,11 @@ class Siren(nn.Module):
 
 
 class ImageFitting(Dataset):
-    def __init__(self, sidelength, image, text):
+    def __init__(self, sidelength, image, text, other_dim):
         super().__init__()
-        img = get_cameraman_tensor(sidelength, image) # this one gets the cameraman data
-        #self.pixels = img.permute(1, 2, 0).view(-1, 1)  # image pixels
+        img = get_cameraman_tensor(sidelength, image)
         self.pixels = img.permute(1, 2, 0).view(-1, 1)
-        self.coords = get_mgrid(sidelength, 2) # coordinates
-        #print("hello, my coordinate is",  self.coords)
+        self.coords = get_mgrid(sidelen = sidelength, dim = 2, text = text, other_dim=other_dim)
 
     def __len__(self):
         return 1
@@ -206,17 +205,21 @@ if __name__ == "__main__":
     # Input Parameters
     parser.add_argument('--input_image', type=str, default="tiny_vorts0008_normalize_dataset/vorts0008_render_001.png")
     parser.add_argument('--input_txt', type=str,  default="text001.txt")
-
+    parser.add_argument('--output_shape', type = int, default=16) # the paper uses 256 for this one
+    parser.add_argument('--other_dim', type=int, default=3)
     config = parser.parse_args()
 
 
     ### Fitting an image
-    cameraman = ImageFitting(sidelength=32, image = config.input_image, text = config.input_txt)
+    cameraman = ImageFitting(sidelength=config.output_shape,
+                             image = config.input_image,
+                             text = config.input_txt,
+                             other_dim=config.other_dim)
 
 
     dataloader = DataLoader(cameraman, batch_size=1, pin_memory=True, num_workers=0)
 
-    img_siren = Siren(in_features=5, out_features=1, hidden_features=16, # original: in feature is 2. hidden feature is 256,
+    img_siren = Siren(in_features=5, out_features=1, hidden_features=config.output_shape, # original: in feature is 2. hidden feature is 256,
                       hidden_layers=3, outermost_linear=True)
     img_siren.to(device)
 
@@ -230,8 +233,14 @@ if __name__ == "__main__":
     model_input, ground_truth = model_input.to(device), ground_truth.to(device)
 
     for step in range(total_steps):
+        print("model_input shape is", model_input.size())
         model_output, coords = img_siren(model_input)
+
+        print("model_output shape is", model_output.size())
+        print("ground truth shape is", ground_truth.size())
+
         loss = ((model_output - ground_truth) ** 2).mean()
+
 
         if not step % steps_til_summary:
             print("Step %d, Total loss %0.6f" % (step, loss))
@@ -240,9 +249,9 @@ if __name__ == "__main__":
 
             #fig, axes = plt.subplots(1, 3, figsize=(18, 6))
             fig, axes = plt.subplots(1, 1, figsize=(18, 6))
-            axes[0].imshow(model_output.cpu().view(256, 256).detach().numpy())
-            axes[1].imshow(img_grad.norm(dim=-1).cpu().view(256, 256).detach().numpy())
-            axes[2].imshow(img_laplacian.cpu().view(256, 256).detach().numpy())
+            axes[0].imshow(model_output.cpu().view(config.output_shape, config.output_shape).detach().numpy())
+            axes[1].imshow(img_grad.norm(dim=-1).cpu().view(config.output_shape, config.output_shape).detach().numpy())
+            axes[2].imshow(img_laplacian.cpu().view(config.output_shape, config.output_shape).detach().numpy())
             plt.show()
             plt.close()
 
