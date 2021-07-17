@@ -216,7 +216,7 @@ if __name__ == "__main__":
 
     dataloader = DataLoader(cameraman, batch_size=1, pin_memory=True, num_workers=0)
 
-    img_siren = Siren(in_features=5, out_features=1, hidden_features=32, # original: in feature is 2. hidden feature is 256,
+    img_siren = Siren(in_features=5, out_features=1, hidden_features=16, # original: in feature is 2. hidden feature is 256,
                       hidden_layers=3, outermost_linear=True)
     img_siren.to(device)
 
@@ -238,7 +238,8 @@ if __name__ == "__main__":
             img_grad = gradient(model_output, coords)
             img_laplacian = laplace(model_output, coords)
 
-            fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+            #fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+            fig, axes = plt.subplots(1, 1, figsize=(18, 6))
             axes[0].imshow(model_output.cpu().view(256, 256).detach().numpy())
             axes[1].imshow(img_grad.norm(dim=-1).cpu().view(256, 256).detach().numpy())
             axes[2].imshow(img_laplacian.cpu().view(256, 256).detach().numpy())
