@@ -27,4 +27,5 @@ arxiv. [[PDF](https://arxiv.org/abs/2006.12057)]
 
 # Recommended Github Repository
 [Awesome Neural Rendering](https://github.com/weihaox/awesome-neural-rendering)
+
 [Awesome Implicit Neural Representations](https://github.com/vsitzmann/awesome-implicit-representations)
