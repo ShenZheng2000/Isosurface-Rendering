@@ -28,13 +28,15 @@ Arxiv 2020. [[PDF](https://arxiv.org/abs/2004.03805)]
 *Hiroharu Kato, Deniz Beker, Mihai Morariu, et.al.*<br>
 Arxiv 2020. [[PDF](https://arxiv.org/abs/2006.12057)]
 
-# Recommended Github Repository
+# Recommended Repository
 [Awesome Neural Rendering](https://github.com/weihaox/awesome-neural-rendering)
 
 [Awesome Implicit Neural Representations](https://github.com/vsitzmann/awesome-implicit-representations)
 
 [Awesome Neural Radiance Fields](https://github.com/yenchenlin/awesome-NeRF)
 
-# Recommended Lectures
+[Neural Rendering](https://paperswithcode.com/task/neural-rendering)
+
+# Recommended Lectures 
 [CS 348I, Stanford](http://cs348i.stanford.edu/#schedule)
 
