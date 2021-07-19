@@ -35,3 +35,6 @@ Arxiv 2020. [[PDF](https://arxiv.org/abs/2006.12057)]
 
 [Awesome Neural Radiance Fields](https://github.com/yenchenlin/awesome-NeRF)
 
+# Recommended Lectures
+[CS 348I, Stanford](http://cs348i.stanford.edu/#schedule)
+
