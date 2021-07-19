@@ -14,16 +14,19 @@ CVPR 2020. [[PDF](https://openaccess.thecvf.com/content_CVPR_2020/papers/Liu_DIS
 *Michael Niemeyer, Lars Mescheder, Michael Oechsle, Andreas Geiger*<br>
 CVPR 2020. [[PDF](https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeyer_Differentiable_Volumetric_Rendering_Learning_Implicit_3D_Representations_Without_3D_Supervision_CVPR_2020_paper.pdf)]
 
+**Multiview Neural Surface Reconstruction by Disentangling Geometry and Appearance**<br>
+*Lior Yariv, Yoni Kasten, Dror Moran, Meirav Galun, Matan Atzmon, Ronen Basri, Yaron Lipman*<br>
+Arxiv 2020. [[PDF](https://arxiv.org/pdf/2003.09852.pdf)]
 
 
 # Review/Survey Papers
 **State of the Art on Neural Rendering**<br>
 *Ayush Tewari, Ohad Fried, Justus Thies, et.al.*<br>
-arxiv. [[PDF](https://arxiv.org/abs/2004.03805)]
+Arxiv 2020. [[PDF](https://arxiv.org/abs/2004.03805)]
 
 **Differentiable Rendering: A Survey**<br>
 *Hiroharu Kato, Deniz Beker, Mihai Morariu, et.al.*<br>
-arxiv. [[PDF](https://arxiv.org/abs/2006.12057)]
+Arxiv 2020. [[PDF](https://arxiv.org/abs/2006.12057)]
 
 # Recommended Github Repository
 [Awesome Neural Rendering](https://github.com/weihaox/awesome-neural-rendering)
