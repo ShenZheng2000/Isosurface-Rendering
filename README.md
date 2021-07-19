@@ -29,3 +29,6 @@ arxiv. [[PDF](https://arxiv.org/abs/2006.12057)]
 [Awesome Neural Rendering](https://github.com/weihaox/awesome-neural-rendering)
 
 [Awesome Implicit Neural Representations](https://github.com/vsitzmann/awesome-implicit-representations)
+
+[Awesome Neural Radiance Fields](https://github.com/yenchenlin/awesome-NeRF)
+
