@@ -44,5 +44,10 @@ def create_matrix(side, n): # n are numbers of variables
 print(create_matrix_noreshape(side = 256, n = 5))
 print(create_matrix(side = 256, n = 5))
 
+'''
+Sample output
+torch.Size([256, 256, 1, 5])
+torch.Size([65536, 5])
+'''
 
 
