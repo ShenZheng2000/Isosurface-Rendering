@@ -38,22 +38,18 @@ def gradient(y, x, grad_outputs=None):
     grad = torch.autograd.grad(y, [x], grad_outputs=grad_outputs, create_graph=True)[0]
     return grad
 
-def get_mgrid(sidelen, text, dim = 2, other_dim = 3): # dim default is 2.
+def get_mgrid(sidelen, text, dim = 2): # dim default is 2.
     '''Generates a flattened grid of (x,y,...) coordinates in a range of -1 to 1.
     sidelen: int
     dim: int'''
-    tensors = tuple(dim * [torch.linspace(-1, 1, steps=sidelen)]) # (x,y） related tensor
-
-    tensors_1 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # first input
-    tensors_2 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # second input
-    tensors_3 = tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) # third input
-
-    tensors = tensors + tensors_1 + tensors_2 + tensors_3 # total tensor
-
-    #print(len(tensors))
+    tensors = tuple([torch.linspace(-1, 1, steps=sidelen)]) + \
+              tuple([torch.linspace(-1, 1, steps=sidelen)])
+              #tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) + \
+              #tuple([torch.linspace(-0.875, -0.875, steps=sidelen)]) + \
+              #tuple([torch.linspace(-0.875, -0.875, steps=sidelen)])
 
     mgrid = torch.stack(torch.meshgrid(*tensors), dim=-1)
-    mgrid = mgrid.reshape(-1, dim + other_dim) # this 3 means another 3 coordinates, need to adjust when additional time step is considered
+    mgrid = mgrid.reshape(-1, dim)
     print("grided image has size of", mgrid.size())
 
     return mgrid
@@ -119,18 +115,22 @@ class SineLayer(nn.Module):
 
 
 class Siren(nn.Module):
-    def __init__(self, in_features, hidden_features, hidden_layers, out_features, outermost_linear=False,
+    def __init__(self, in_features, hidden_features, hidden_layers,
+                 out_features, outermost_linear=False,
                  first_omega_0=30, hidden_omega_0=30.):
         super().__init__()
 
         self.net = []
+        # first SineLayer
         self.net.append(SineLayer(in_features, hidden_features,
                                   is_first=True, omega_0=first_omega_0))
 
+        # Subsequent SineLayer
         for i in range(hidden_layers):
             self.net.append(SineLayer(hidden_features, hidden_features,
                                       is_first=False, omega_0=hidden_omega_0))
 
+        # Final Layer (Linear or SineLayer)
         if outermost_linear:
             final_linear = nn.Linear(hidden_features, out_features)
 
@@ -181,11 +181,34 @@ class Siren(nn.Module):
 
 
 class ImageFitting(Dataset):
-    def __init__(self, sidelength, image, text, other_dim):
+    def __init__(self, sidelength, image, text):
         super().__init__()
+        # get the image
         img = get_cameraman_tensor(sidelength, image)
+
+        # read the text in a list (try read first line first)
+        my_list = []
+        with open(text) as f:
+            for line in f:
+                my_list.extend([float(i) for i in line.split()])
+
+        print("my list is", my_list)
+
+        # get the label from list
+        third = my_list[0]
+        print("third element is", third)
+
+        fourth = my_list[1]
+        print("fourth element is", fourth)
+
+        fifth = my_list[2]
+        print("fifth element is", fifth)
+
+        # get pixels and coordinates
         self.pixels = img.permute(1, 2, 0).view(-1, 1)
-        self.coords = get_mgrid(sidelen = sidelength, dim = 2, text = text, other_dim=other_dim)
+        #self.coords = get_mgrid(sidelen = sidelength, dim = 2, text = text)
+        self.coords = create_matrix(third, fourth, fifth, side = sidelength, n = 5)
+        print(self.coords)
 
     def __len__(self):
         return 1
@@ -196,6 +219,26 @@ class ImageFitting(Dataset):
         return self.coords, self.pixels
 
 
+def create_matrix(third, fourth, fifth, side, n): # n are numbers of variables
+
+    # Create a 4d tensor of side * side * 1 * n
+    my_tensor = torch.zeros((side, side, 1, n))
+
+    # fill 2d tensors with value
+    for i in range(0, side):
+        for j in range(0, side):
+            my_tensor[i][j][0][0] = 1 # the 1st variable
+            my_tensor[i][j][0][1] = 1 # the 2nd variable
+            my_tensor[i][j][0][2] = third # the 3rd variable
+            my_tensor[i][j][0][3] = fourth # the 4th variable
+            my_tensor[i][j][0][4] = fifth # the 5th variable
+
+    # reshape tensor to 2d
+    my_tensor = my_tensor.reshape(-1, n)
+
+    # return
+    return my_tensor
+
 
 if __name__ == "__main__":
 
@@ -204,8 +247,8 @@ if __name__ == "__main__":
 
     # Input Parameters
     parser.add_argument('--input_image', type=str, default="tiny_vorts0008_normalize_dataset/vorts0008_render_001.png")
-    parser.add_argument('--input_txt', type=str,  default="text001.txt")
-    parser.add_argument('--output_shape', type = int, default=16) # the paper uses 256 for this one
+    parser.add_argument('--input_txt', type=str,  default="text002.txt")
+    parser.add_argument('--output_shape', type = int, default=256) # the paper uses 256 for this one
     parser.add_argument('--other_dim', type=int, default=3)
     config = parser.parse_args()
 
@@ -213,13 +256,12 @@ if __name__ == "__main__":
     ### Fitting an image
     cameraman = ImageFitting(sidelength=config.output_shape,
                              image = config.input_image,
-                             text = config.input_txt,
-                             other_dim=config.other_dim)
+                             text = config.input_txt)
 
 
     dataloader = DataLoader(cameraman, batch_size=1, pin_memory=True, num_workers=0)
 
-    img_siren = Siren(in_features=5, out_features=1, hidden_features=config.output_shape, # original: in feature is 2. hidden feature is 256,
+    img_siren = Siren(in_features=5, out_features=1, hidden_features=256, # original: in feature is 2. hidden feature is 256,
                       hidden_layers=3, outermost_linear=True)
     img_siren.to(device)
 
@@ -233,11 +275,11 @@ if __name__ == "__main__":
     model_input, ground_truth = model_input.to(device), ground_truth.to(device)
 
     for step in range(total_steps):
-        print("model_input shape is", model_input.size())
+        #print("model_input shape is", model_input.size())
         model_output, coords = img_siren(model_input)
 
-        print("model_output shape is", model_output.size())
-        print("ground truth shape is", ground_truth.size())
+        #print("model_output shape is", model_output.size())
+        #print("ground truth shape is", ground_truth.size())
 
         loss = ((model_output - ground_truth) ** 2).mean()
 
@@ -248,7 +290,7 @@ if __name__ == "__main__":
             img_laplacian = laplace(model_output, coords)
 
             #fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-            fig, axes = plt.subplots(1, 1, figsize=(18, 6))
+            fig, axes = plt.subplots(1, 3, figsize=(18, 6))
             axes[0].imshow(model_output.cpu().view(config.output_shape, config.output_shape).detach().numpy())
             axes[1].imshow(img_grad.norm(dim=-1).cpu().view(config.output_shape, config.output_shape).detach().numpy())
             axes[2].imshow(img_laplacian.cpu().view(config.output_shape, config.output_shape).detach().numpy())
