@@ -18,6 +18,19 @@ CVPR 2020. [[PDF](https://openaccess.thecvf.com/content_CVPR_2020/papers/Niemeye
 *Lior Yariv, Yoni Kasten, Dror Moran, Meirav Galun, Matan Atzmon, Ronen Basri, Yaron Lipman*<br>
 Arxiv 2020. [[PDF](https://arxiv.org/pdf/2003.09852.pdf)]
 
+Here are some must-read papers.
+**Implicit Neural Representations with Periodic Activation Functions**<br>
+*Vincent Sitzmann, Julien N. P. Martel, Alexander W. Bergman, David B. Lindell, Gordon Wetzstein *<br>
+Arxiv 2020. [[PDF](https://arxiv.org/abs/2006.09661.pdf)]
+
+**NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis**<br>
+*Ben Mildenhall, Pratul P. Srinivasan, Matthew Tancik, Jonathan T. Barron, Ravi Ramamoorthi, Ren Ng*<br>
+Arxiv 2020. [[PDF](https://arxiv.org/abs/2003.08934.pdf)]
+
+**Compressive Neural Representations of Volumetric Scalar Fields**<br>
+*Yuzhe Lu, Kairong Jiang, Joshua A. Levine, Matthew Berger *<br>
+Arxiv 2021. [[PDF](https://arxiv.org/abs/2104.04523.pdf)] [[MyNotes](https://zhuanlan.zhihu.com/p/391897326)]
+
 
 # Review/Survey Papers
 **State of the Art on Neural Rendering**<br>
