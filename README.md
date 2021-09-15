@@ -1,6 +1,8 @@
 # Isosurface-Rendering
 This is a repository for the iSURE 2021 Research Project: Implicit Neural Rendering for isosurfaces
 
+**Note: This repository is archieved. Please visit our new [site](https://github.com/ShenZheng2000/implicit-neural-rendering-for-isosurfaces) for recent updates.**
+
 # Collection of SOTA Papers
 **Autolabeling 3D Objects with Differentiable Rendering of SDF Shape Priors**<br>
 *Sergey Zakharov, Wadim Kehl, Arjun Bhargava, Adrien Gaidon.*<br>
